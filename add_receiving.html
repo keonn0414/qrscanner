@@ -3,41 +3,50 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Add Receiving Item</title>
+    <title>Transfer item</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;800&family=Fauna+One&family=Poppins:ital,wght@0,100;0,300;0,400;0,500;0,700;1,100&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="../stylesheet_folder/index_style.css">
-    <!-- JavaScript Includes -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <!-- SELECT2 LIBRARY CDN'S -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
-
 </head>
 <body>
     <div class="container-fluid">
         <div class="row">
             <div id="page_title" class="col-md-5">
-                <h3 class="mt-3">ADD RECEIVING ITEM</h3>
+                <h3 class="mt-3">Transfer item</h3>
             </div>
             <div id="footer_logout" class="col-md-7">    
-                  
+                <?php
+                    if (isset($_SESSION['user_id'])) {
+                        echo '<p class="">Welcome, ' . $_SESSION['user_fullname'] . '!</p>';
+                        echo '<p class="">Branch ID: ' . $_SESSION['branch_id'] . '</p>'; 
+                        echo '<a href="logout.php" class="btn mr-3" >Logout</a>';
+                    } else {
+                        echo '<p id="logged_out">Please <a href="login.php" class="btn" >log in</a></p>';
+                    }
+                ?>   
             </div>
         </div>
         <div class="row">
             <div class="col-md-3">
-                <a id="back_button" class="btn btn-secondary" href="../receiving_management.php">&larr; Back to Receiving Management</a>
+                <a id="back_button" class="btn btn-secondary" href="../transmittal.php">&larr; Back to Sales Order</a>
             </div>
+            
         </div>
+
+        
         <!-- Display the success message here -->
         
+        
+        
+        <?php if (!empty($error_message)) : ?>
+            <p style="color: red;"><?= $error_message ?></p>
+        <?php endif; ?>
+        
+        
 
-        <!-- Display the QR code form -->
-        <form id="receivingForm" method="post">
+        <!-- Display the sales query form -->
+        <form id="salesForm" method="post">
             <!-- QR Scanner start here -->
             <div id="qr_display" class="row">
                 <script src="html5-qrcode.min.js"></script>
@@ -61,8 +70,9 @@
                 </div>-->
                 </div>
                 <script type="text/javascript">
-                 /* function onScanSuccess(qrCodeMessage) {
-                    document.getElementById('qr_code').value = qrCodeMessage;
+                /* function onScanSuccess(qrCodeMessage) {
+                    document.getElementById('qr_code1').value = qrCodeMessage;
+                    enterfun();
                     //document.getElementById('result').innerHTML = '<span class="result">'+qrCodeMessage+'</span>';
                 }
                 function onScanError(errorMessage) {
@@ -70,33 +80,15 @@
                 }
                 var html5QrcodeScanner = new Html5QrcodeScanner(
                     "reader", { fps: 10, qrbox: 250 });
-                html5QrcodeScanner.render(onScanSuccess, onScanError);  */
-
-                function onScanSuccess(decodedText, decodedResult) {
-                // handle the scanned code as you like, for example:
-                document.getElementById('qr_code').value = decodedText;
-                }
-
-                let config = {
-                fps: 10,
-                qrbox: {width: 100, height: 100},
-                rememberLastUsedCamera: true,
-                facingMode: "environment"
-                // Only support camera scan type.
-                };
-
-                let html5QrcodeScanner = new Html5QrcodeScanner(
-                "reader", config, /* verbose= */ false);
-                html5QrcodeScanner.render(onScanSuccess);
-                
-                
-                //const html5QrCode = new Html5Qrcode("reader");
-                //const qrCodeSuccessCallback = (decodedText, decodedResult) => {
+                html5QrcodeScanner.render(onScanSuccess, onScanError); */
+                const html5QrCode = new Html5Qrcode("reader");
+                function qrCodeSuccessCallback (decodedText, decodedResult) {
                     /* handle success */
-                    //document.getElementById('qr_code').value = decodedText;
-                //};
-                //document.getElementById('qr_code').value = decodedResult;
-                /* const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+                    var result = decodedText;
+                    document.getElementById('qr_code1').value = result;
+                    updateItemInfo1()
+                };
+                const config = { fps: 10, qrbox: { width: 250, height: 250 } };
 
                 // If you want to prefer front camera
                 //html5QrCode.start({ facingMode: "user" }, config, qrCodeSuccessCallback);
@@ -110,100 +102,175 @@
                 // Select back camera or fail with `OverconstrainedError`.
                 html5QrCode.start({ facingMode: { exact: "environment"} }, config, qrCodeSuccessCallback);
                 html5QrCode.start({ deviceId: { exact: cameraId} }, config, qrCodeSuccessCallback);
-                //html5QrCode.render(qrCodeSuccessCallback); */
+                document.getElementById('qr_code1').value = result;
                 </script>
             </div>
             <!-- QR Scanner end here -->
             <div class="mb-3">
-                <label for="qr_code" class="form-label">QR Code:</label>
-                <input type="text" id="qr_code" name="qr_code" class="form-control" placeholder="Enter QR code number here" required >
-            </div>
-            <div class="mb-3">
-                <label for="item_info" class="form-label">Select Item:</label>
-                <select id="item_info" name="item_info" class="form-control" required data-live-search="true">
-                    <option value="" data-box-price="" data-cutting-price="">Select an item</option>
+                <label for="qr_code1" class="form-label">Select QR Code:</label>
+                <input type="text" id="qr_code1" name="qr_code1" class="form-control" placeholder="Enter QR code number here" onkeydown="updateItemInfo1()" onkeyup="updateItemInfo1()" onchange="enterfun()" required >
                     
-                </select>
+                    <!-- end of press enter once the qr scan image -->
+                
+            </div>
+
+            <div class="mb-3">
+                <label for="item_info" class="form-label">Item Information:</label>
+                <div id="item_info" class="form-control" style="height: 10rem" readonly>
+                </div>
+                
+                
+                
+            </div>
+
+            <input type="hidden" id="item_id" name="item_id" value="<?php echo $itemID; ?>">
+            <input type="hidden" id="qty" name="qty">
+            <input type="hidden" id="pricetype" name="pricetype">
+
+            <div class="mb-3">
+                <label for="item_qty" class="form-label">Item Quantity:</label>
+                <input type="number" step="any" id="item_qty" name="item_qty" class="form-control" required value="<?php echo $itemQty; ?>" max="<?php echo $selectedItem['current_qty']; ?>">
+                
             </div>
             <div class="mb-3">
-                <label for="BuyingPrice" class="form-label">Buying Price</label>
-                <input type="number" step="any" id="BuyingPrice" name="BuyingPrice" class="form-control" required value="<?php echo $BuyingPrice; ?>" onchange="GetPrice();" onkeydown="GetPrice();" onkeyup="GetPrice();">
+                    <div class="text-danger" id="errmsg"></div>
             </div>
-            <!-- <div class="mb-3">
-                <label for="box_price" class="form-label">Box Price:</label>
-                <input type="text" id="box_price" name="box_price" class="form-control" readonly value="<?php //echo $boxPrice; ?>">
-            </div>
-            <div class="mb-3">
-                <label for="cutting_price" class="form-label">Cutting Price:</label>
-                <input type="text" id="cutting_price" name="cutting_price" class="form-control" readonly value="<?php //echo $cuttingPrice; ?>">
-            </div> -->
+
             
-            <div class="mb-3">
-                <label for="qty" class="form-label">Receiving Qty (KG):</label>
-                <input type="number" id="qty" name="qty" class="form-control" required value="<?php echo $qty; ?>" onchange="GetPrice();" onkeydown="GetPrice();" onkeyup="GetPrice();" step="any">
-            </div>
-            <div class="mb-3">
-                <label for="TotalPrice" class="form-label">Total Price:</label>
-                <input type="number" id="TotalPrice" name="TotalPrice" class="form-control" required value="<?php echo $TotalPrice; ?>" readonly step="any">
-            </div>
             <div class="row">
                 <div class="col-md-2">
-                    <input id="add_stock" class="btn btn-primary" type="submit" value="Save">
+                    <!-- <input id="add_stock" class="btn btn-primary" type="submit" value="Add Item"> -->
+                    <a id="post_button" class="btn btn-primary" href="#" data-toggle="modal" data-target="#confirmationModal" onclick="refreshmsg()">Save</a>
                 </div>
             </div>
-        </form>
             
+        </form>
     </div>
+    <!-- Add JavaScript to show a confirmation dialog -->
+        <!-- Modal New Code Also -->
+        <div id="confirmationModal" class="modal fade" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Confirmation</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body" >
+                        <div class="container">
+                        <div class="row h5" id="confirmmsg">Are you sure you want to Transfer the stock? </div>
+                        <div class="row text-danger">Note : All stocks and expenses with this item will be transfer to the selected branch.</div>
+                        </div>                    
+                    </div>
+                    <div class="modal-footer">
+                            
+                            <a class="btn btn-success" onclick="savetransfer();">Yes</a>
+                            <button type="button" class="btn btn-danger" data-dismiss="modal">No</button>
+                        
+                    </div>
+                </div>
+            </div>
+        </div> <!-- end of modal section -->
+    <script>
 
-    <!-- Add this JavaScript code inside your HTML file, preferably just before the closing </body> tag -->
-<script type="text/javascript">
-    function GetPrice(){
-        var BuyingPrice = $('#BuyingPrice').val();
-        var qty = $('#qty').val();
-        TotalPrice = BuyingPrice * qty;
-        //TotalPrice = ReplaceNumberWithCommas(TotalPrice);
-        $('#TotalPrice').val(TotalPrice);
+        // Initialize the form
+        //updateItemInfo();*/
+        function refreshmsg(){
+            var msgdiv = document.getElementById('confirmmsg');
+                msgdiv.innerHTML = "Are you sure you want to Transfer the stock?";
+            
+        }
+        function getOption() {
+            selectElement = document.querySelector('#selected_price');
+            output = selectElement.options[selectElement.selectedIndex].value;
+            if (output == 'box_price'){
+                output = 'box price'; 
+            } else {
+                output = 'cutting price';
+            }
+            document.getElementById("pricetype").value = output;
+        }
+        function additem(){
+            
+        }
+        function savetransfer(){
+            //var branchesV = $('#branchesV').find(":selected").val();
+            //var branchestxt = $('#branchesV').find(":selected").text();
+            //alert(branchesV);
+            var itemQty = parseFloat($('#item_qty').val());
+            var currentQty = parseFloat($('#qty').val());
+            if (itemQty>currentQty){
+                var msgdiv = document.getElementById('confirmmsg');
+                msgdiv.innerHTML = "Quantity is more than the current quantity, please close this and check the number of stock available.";
+            } else {
+                //alert (branchesV + '-' +itemID);
+                var qr_code = $('#qr_code1').val();
+                //alert(qr_code+itemQty);
+                location = '../save_folder/save_transfer.php?id='+qr_code+'&qty='+itemQty
+            }
+            
+        }
+        function updateItemInfo1() {
+            const qrCodeSelect = document.getElementById('qr_code1');
+            const itemInfoDiv = document.getElementById('item_info');
+            const itemIDInput = document.getElementById('item_id');
+            //const selectedPriceSelect = document.getElementById('selected_price');
+            const itemQtyInput = document.getElementById('item_qty');
+            var qty = document.getElementById('qty');
+            
+            // Get the selected QR code
+            const selectedQRCode = qrCodeSelect.value;
 
+            // Find the item data based on the selected QR code
+            const selectedItem = <?php echo json_encode($stockData); ?>.find(item => item.qr_code === selectedQRCode);
 
-    }
-    function ReplaceNumberWithCommas(yourNumber) {
-    //Seperates the components of the number
-    var n= yourNumber.toString().split(".");
-    //Comma-fies the first part
-    n[0] = n[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
-    //Combines the two sections
-    return n.join(".");
-}
-    // Function to update box_price and cutting_price based on the selected item
-    function updatePrices() {
-        const itemInfoSelect = document.getElementById('item_info');
-        const boxPriceInput = document.getElementById('box_price');
-        const cuttingPriceInput = document.getElementById('cutting_price');
-        
-        // Get the selected item's data attributes
-        const selectedItem = itemInfoSelect.options[itemInfoSelect.selectedIndex];
-        const boxPrice = selectedItem.getAttribute('data-box-price');
-        const cuttingPrice = selectedItem.getAttribute('data-cutting-price');
-        
-        // Update the input fields with the selected item's prices
-        boxPriceInput.value = boxPrice;
-        cuttingPriceInput.value = cuttingPrice;
-    }
-    
-    // Attach the updatePrices function to the change event of the item_info select element
-    const itemInfoSelect = document.getElementById('item_info');
-    itemInfoSelect.addEventListener('change', updatePrices);
-    
-    // Initialize prices on page load
-    updatePrices();
-</script>
-<!-- NEW SCRIPT FOR THE SEARCH BAR ON THE LIST OF ITEM ON RECEIVING -->
-<script>
-    $(document).ready(function () {
-        // Initialize Select2 on your select element
-        $("#item_info").select2();
-    });
-</script>
+            // Update the Item Information <div> with the retrieved data
+            
+                
+            
+                if (selectedItem) {
+                    if (selectedItem.current_qty == 0){
+                        itemInfoDiv.innerHTML = 'No stock available.'
+                        selectedPriceSelect.innerHTML = '';
+                        itemQtyInput.max = '';
+                    } else {
+                        itemInfoDiv.innerHTML = `
+                        Item ID: ${selectedItem.item_id}<br>
+                        Item Name: ${selectedItem.item_name}<br>
+                        Brand: ${selectedItem.brand}<br>
+                        Type: ${selectedItem.type}<br>
+                        Buying Price: ${selectedItem.buying_price}<br>
+                        Current Qty: ${selectedItem.current_qty}
+                        
+                        `;
+                        //selectedPriceSelect.innerHTML = '';
+                        // Automatically fill the Item ID input
+                        itemIDInput.value = selectedItem.item_id;
+                        qty.value = selectedItem.current_qty;
+                        //current_qty.value = 
+                        
+                        
+                        getOption();
+                        // Update the maximum allowed quantity based on the selected item's current quantity
+                        itemQtyInput.max = selectedItem.current_qty;
+                    }                
+                } else {
+                    itemInfoDiv.innerHTML = '--'; // Clear the Item Information <div> if no data found
+                    itemIDInput.value = ''; // Clear the Item ID input
+                    selectedPriceSelect.innerHTML = ''; // Clear the Price dropdown options
+                    itemQtyInput.max = ''; // Clear the maximum value if no item is selected
+                }
+            
+            
+        }
 
+        // Initialize the form
+        //updateItemInfo1();
+    </script>
+    <!-- JavaScript Includes -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>
