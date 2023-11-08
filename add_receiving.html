@@ -16,15 +16,7 @@
                 <h3 class="mt-3">Transfer item</h3>
             </div>
             <div id="footer_logout" class="col-md-7">    
-                <?php
-                    if (isset($_SESSION['user_id'])) {
-                        echo '<p class="">Welcome, ' . $_SESSION['user_fullname'] . '!</p>';
-                        echo '<p class="">Branch ID: ' . $_SESSION['branch_id'] . '</p>'; 
-                        echo '<a href="logout.php" class="btn mr-3" >Logout</a>';
-                    } else {
-                        echo '<p id="logged_out">Please <a href="login.php" class="btn" >log in</a></p>';
-                    }
-                ?>   
+                  
             </div>
         </div>
         <div class="row">
