@@ -61,7 +61,7 @@
                 </div>-->
                 </div>
                 <script type="text/javascript">
-                /* function onScanSuccess(qrCodeMessage) {
+                 /* function onScanSuccess(qrCodeMessage) {
                     document.getElementById('qr_code').value = qrCodeMessage;
                     //document.getElementById('result').innerHTML = '<span class="result">'+qrCodeMessage+'</span>';
                 }
@@ -70,26 +70,47 @@
                 }
                 var html5QrcodeScanner = new Html5QrcodeScanner(
                     "reader", { fps: 10, qrbox: 250 });
-                html5QrcodeScanner.render(onScanSuccess, onScanError); */
-                const html5QrCode = new Html5Qrcode("reader");
-                const qrCodeSuccessCallback = (decodedText, decodedResult) => {
-                    /* handle success */
-                    document.getElementById('qr_code').value = decodedResult;
+                html5QrcodeScanner.render(onScanSuccess, onScanError);  */
+
+                function onScanSuccess(decodedText, decodedResult) {
+                // handle the scanned code as you like, for example:
+                document.getElementById('qr_code').value = decodedText;
+                }
+
+                let config = {
+                fps: 10,
+                qrbox: {width: 100, height: 100},
+                rememberLastUsedCamera: true,
+                facingMode: "environment"
+                // Only support camera scan type.
                 };
-                const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+
+                let html5QrcodeScanner = new Html5QrcodeScanner(
+                "reader", config, /* verbose= */ false);
+                html5QrcodeScanner.render(onScanSuccess);
+                
+                
+                //const html5QrCode = new Html5Qrcode("reader");
+                //const qrCodeSuccessCallback = (decodedText, decodedResult) => {
+                    /* handle success */
+                    //document.getElementById('qr_code').value = decodedText;
+                //};
+                //document.getElementById('qr_code').value = decodedResult;
+                /* const config = { fps: 10, qrbox: { width: 250, height: 250 } };
 
                 // If you want to prefer front camera
                 //html5QrCode.start({ facingMode: "user" }, config, qrCodeSuccessCallback);
 
                 // If you want to prefer back camera
-                //html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback);
+                html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback);
 
                 // Select front camera or fail with `OverconstrainedError`.
                 //html5QrCode.start({ facingMode: { exact: "user"} }, config, qrCodeSuccessCallback);
 
                 // Select back camera or fail with `OverconstrainedError`.
                 html5QrCode.start({ facingMode: { exact: "environment"} }, config, qrCodeSuccessCallback);
-                //html5QrCode.start({ deviceId: { exact: cameraId} }, config, qrCodeSuccessCallback);
+                html5QrCode.start({ deviceId: { exact: cameraId} }, config, qrCodeSuccessCallback);
+                //html5QrCode.render(qrCodeSuccessCallback); */
                 </script>
             </div>
             <!-- QR Scanner end here -->
