@@ -74,6 +74,7 @@
                 const html5QrCode = new Html5Qrcode("reader");
                 const qrCodeSuccessCallback = (decodedText, decodedResult) => {
                     /* handle success */
+                    document.getElementById('qr_code').value = decodedResult;
                 };
                 const config = { fps: 10, qrbox: { width: 250, height: 250 } };
 
